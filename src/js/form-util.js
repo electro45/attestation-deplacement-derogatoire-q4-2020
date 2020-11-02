@@ -59,6 +59,7 @@ export function setReleaseDateTime (releaseDateInput) {
   const loadedDate = new Date()
   releaseDateInput.value = getFormattedDate(loadedDate)
 }
+
 export function toAscii (string) {
   if (typeof string !== 'string') {
     throw new Error('Need string')
@@ -67,6 +68,7 @@ export function toAscii (string) {
   const asciiString = accentsRemoved.replace(/[^\x00-\x7F]/g, '') // eslint-disable-line no-control-regex
   return asciiString
 }
+
 export function getProfile (formInputs) {
   const fields = {}
   for (const field of formInputs) {
@@ -91,9 +93,14 @@ export function getReasons (reasonInputs) {
 }
 
 export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonAlert, snackbar) {
+  const dataForm = JSON.parse(localStorage.getItem('data'))
   formInputs.forEach((input) => {
     const exempleElt = input.parentNode.parentNode.querySelector('.exemple')
     const validitySpan = input.parentNode.parentNode.querySelector('.validity')
+    const id = input.id.split('-')[1]
+    if (dataForm[id] !== undefined && id !== 'datesortie' && id !== 'heuresortie') {
+      input.value = dataForm[id]
+    }
     if (input.placeholder && exempleElt) {
       input.addEventListener('input', (event) => {
         if (input.value) {
@@ -139,12 +146,17 @@ export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonA
       return
     }
 
+    localStorage.setItem('data', JSON.stringify(getProfile(formInputs)))
+
     const pdfBlob = await generatePdf(getProfile(formInputs), reasons, pdfBase)
 
     const creationInstant = new Date()
     const creationDate = creationInstant.toLocaleDateString('fr-CA')
     const creationHour = creationInstant
-      .toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+      .toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
       .replace(':', '-')
 
     downloadBlob(pdfBlob, `attestation-${creationDate}_${creationHour}.pdf`)
