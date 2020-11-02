@@ -98,7 +98,7 @@ export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonA
     const exempleElt = input.parentNode.parentNode.querySelector('.exemple')
     const validitySpan = input.parentNode.parentNode.querySelector('.validity')
     const id = input.id.split('-')[1]
-    if (dataForm[id] !== undefined && id !== 'datesortie' && id !== 'heuresortie') {
+    if (dataForm && dataForm[id] !== undefined && id !== 'datesortie' && id !== 'heuresortie') {
       input.value = dataForm[id]
     }
     if (input.placeholder && exempleElt) {
